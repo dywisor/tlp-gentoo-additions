@@ -1,0 +1,162 @@
+# Makefile for TLP
+
+# the libdir name, typical LIBDIRs are 'lib' and 'lib64'
+LIBDIR ?= lib
+
+SBIN  = $(DESTDIR)/usr/sbin
+BIN   = $(DESTDIR)/usr/bin
+PMETC = $(DESTDIR)/etc/pm/power.d
+TLIB  = $(DESTDIR)/usr/$(LIBDIR)/tlp-pm
+PLIB  = $(DESTDIR)/usr/$(LIBDIR)/pm-utils
+ULIB  = $(DESTDIR)/$(LIBDIR)/udev
+NMDSP = $(DESTDIR)/etc/NetworkManager/dispatcher.d
+
+# Location of TLP's config file
+# Hint: solely changing this will render the installation unusable,
+# you have to change constant definitions in scripts too!
+CONFFILE ?= $(DESTDIR)/etc/default/tlp
+
+# Important:
+#  This Makefile allows to install TLP's files modularly (e.g. only certain
+#  groups/sets of files) by blacklisting unwanted parts via TLP_NO_<...>.
+#  However, this does *not* mean that TLP is functional without the missing
+#  files. Use it at your own risk. In most cases, you'll have to install
+#  replacement files separately.
+#
+#  Also note that the uninstall targets are not as safe as those in the
+#  original Makefile ('rm -f' instead of 'rm').
+#  Another difference is that this Makefile using symlinks instead of
+#  hardlinks.
+#
+# All known TLP_NO_ variables:
+# - TLP_NO_BASHCOMP
+# - TLP_NO_CONFIG
+# - TLP_NO_CORE
+# - TLP_NO_INITD
+# - TLP_NO_RADIO
+# - TLP_NO_TPACPI
+# - TLP_NO_UDEV
+# - TLP_NO_USB
+# - TLP_NO_X
+#
+
+.PHONY: all clean \
+	install install-tlp install-rdw \
+	uninstall uninstall-tlp uninstall-rdw
+
+all:
+	@/bin/true
+
+clean:
+	@/bin/true
+
+install-tlp:
+	# Package tlp
+
+	## "core" files
+ifndef TLP_NO_CORE
+	install -D -m 755 tlp $(SBIN)/tlp
+	install -D -m 755 tlp-stat $(BIN)/tlp-stat
+
+	install -D -m 755 tlp-run-on $(BIN)/run-on-ac
+	ln -s run-on-ac $(BIN)/run-on-bat
+
+	install -D -m 755 tlp-functions $(TLIB)/tlp-functions
+	install -D -m 755 tlp-rf-func   $(TLIB)/tlp-rf-func
+	install -D -m 755 tlp-nop       $(TLIB)/tlp-nop
+
+	install -D -m 755 zztlp $(PLIB)/power.d/zztlp
+	install -D -m 755 49bay $(PLIB)/sleep.d/49bay
+endif
+
+	## config file
+ifndef TLP_NO_CONFIG
+	[ -f $(CONFFILE) ] || install -D -m 644 default $(CONFFILE)
+endif
+
+	## init file
+ifndef TLP_NO_INITD
+	install -D -m 755 tlp.init $(DESTDIR)/etc/init.d/tlp
+endif
+
+	## radio-specific files
+ifndef TLP_NO_RADIO
+	install -D -m 755 tlp-rf $(BIN)/bluetooth
+	ln -s bluetooth $(BIN)/wifi
+	ln -s bluetooth $(BIN)/wwan
+
+	install -D -m 755 49wwan $(PLIB)/sleep.d/49wwan
+endif
+
+	## usb
+ifndef TLP_NO_USB
+	install -D -m 755 tlp-usblist $(BIN)/tlp-usblist
+endif
+
+	## tpacpi
+ifndef TLP_NO_TPACPI
+	install -D -m 755 tpacpi-bat $(TLIB)/tpacpi-bat
+endif
+
+	## udev
+# (might be replacable with mdev/acpid)
+ifndef TLP_NO_UDEV
+	install -D -m 755 tlp-usb-udev $(ULIB)/tlp-usb-udev
+	install -D -m 644 tlp.rules $(ULIB)/rules.d/40-tlp.rules
+endif
+
+	## bashcomp
+ifndef TLP_NO_BASHCOMP
+	install -D -m 644 tlp.bash_completion $(DESTDIR)/etc/bash_completion.d/tlp
+endif
+
+
+install-rdw:
+	# Package tlp-rdw
+ifdef TLP_NO_RADIO
+		$(error TLP_NO_RADIO must not be set)
+
+else
+	## "core" files
+		install -D -m 755 tlp-rdw-nm $(NMDSP)/99tlp-rdw-nm
+		install -D -m 755 48tlp-rdw-lock $(PLIB)/sleep.d/48tlp-rdw-lock
+	## udev
+ifndef TLP_NO_UDEV
+		install -D -m 644 tlp-rdw.rules $(ULIB)/rules.d/40-tlp-rdw.rules
+		install -D -m 755 tlp-rdw-udev $(ULIB)/tlp-rdw-udev
+endif
+endif
+
+install: install-tlp install-rdw
+
+uninstall-tlp:
+	# Package tlp
+	rm -f $(SBIN)/tlp
+	rm -f $(BIN)/bluetooth
+	rm -f $(BIN)/wifi
+	rm -f $(BIN)/wwan
+	rm -f $(BIN)/run-on-ac
+	rm -f $(BIN)/run-on-bat
+	rm -f $(BIN)/tlp-stat
+	rm -f $(BIN)/tlp-usblist
+	rm -f $(TLIB)/tpacpi-bat
+	rm -f $(TLIB)/tlp-functions
+	rm -f $(TLIB)/tlp-rf-func
+	test ! -d $(TLIB) || rmdir $(TLIB)
+	rm -f $(ULIB)/tlp-usb-udev
+	rm -f $(ULIB)/rules.d/40-tlp.rules
+	rm -f $(DESTDIR)/etc/init.d/tlp
+	rm -f $(DESTDIR)/etc/network/if-up.d/tlp-ifup
+	rm -f $(PLIB)/power.d/zztlp
+	rm -f $(PLIB)/sleep.d/49wwan
+	rm -f $(PLIB)/sleep.d/49bay
+	rm -f $(DESTDIR)/etc/bash_completion.d/tlp
+
+uninstall-rdw:
+	# Package tlp-rdw
+	rm -f $(ULIB)/rules.d/40-tlp-rdw.rules
+	rm -f $(ULIB)/tlp-rdw-udev
+	rm -f $(NMDSP)/99tlp-rdw-nm
+	rm -f $(PLIB)/sleep.d/48tlp-rdw-lock
+
+uninstall: uninstall-tlp uninstall-rdw
