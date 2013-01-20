@@ -10,9 +10,6 @@
 #  base directory for certain operations
 readonly ROOT="${TARBALL_ROOT_DIRECTORY:-${PWD}}"
 
-echo "$ROOT"
-exit 1
-
 # str DEVNULL
 : ${DEVNULL:=/dev/null}
 

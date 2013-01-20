@@ -38,7 +38,8 @@ readonly PROJECT_DIR
 
 # constant str PROJECT_NAME
 #  (the project name)
-readonly PROJECT_NAME="${PROJECT_DIR##*/}"
+PROJECT_NAME="${PROJECT_DIR##*/}"
+readonly PROJECT_NAME="${PROJECT_NAME#tlp-}"
 
 # constant str PROJECT_TARBALL_NAME_PREFIX
 #  this string will be the prefix for all
