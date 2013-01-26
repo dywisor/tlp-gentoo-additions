@@ -10,6 +10,7 @@ TLIB  = $(DESTDIR)/usr/$(LIBDIR)/tlp-pm
 PLIB  = $(DESTDIR)/usr/$(LIBDIR)/pm-utils
 ULIB  = $(DESTDIR)/$(LIBDIR)/udev
 NMDSP = $(DESTDIR)/etc/NetworkManager/dispatcher.d
+ACPI  = $(DESTDIR)/etc/acpi
 
 # Location of TLP's config file
 # Hint: solely changing this will render the installation unusable,
@@ -25,14 +26,17 @@ CONFFILE ?= $(DESTDIR)/etc/default/tlp
 #
 #  Also note that the uninstall targets are not as safe as those in the
 #  original Makefile ('rm -f' instead of 'rm').
-#  Another difference is that this Makefile using symlinks instead of
+#  Another difference is that this Makefile is using symlinks instead of
 #  hardlinks.
+#  Lastly, this Makefile does not provide any "uninstall" targets. Instead,
+#  it relies on the package manager.
 #
 # All known TLP_NO_ variables:
 # - TLP_NO_BASHCOMP
 # - TLP_NO_CONFIG
 # - TLP_NO_CORE
 # - TLP_NO_INITD
+# - TLP_NO_PCI
 # - TLP_NO_RADIO
 # - TLP_NO_TPACPI
 # - TLP_NO_UDEV
@@ -41,8 +45,7 @@ CONFFILE ?= $(DESTDIR)/etc/default/tlp
 #
 
 .PHONY: all clean \
-	install install-tlp install-rdw \
-	uninstall uninstall-tlp uninstall-rdw
+	install install-tlp install-rdw
 
 all:
 	@/bin/true
@@ -86,11 +89,19 @@ ifndef TLP_NO_RADIO
 	ln -s bluetooth $(BIN)/wwan
 
 	install -D -m 755 49wwan $(PLIB)/sleep.d/49wwan
+
+	install -D -m 644 thinkpad-radiosw $(ACPI)/events/thinkpad-radiosw
+	install -m 755 thinkpad-radiosw.sh $(ACPI)/thinkpad-radiosw.sh
 endif
 
 	## usb
 ifndef TLP_NO_USB
 	install -D -m 755 tlp-usblist $(BIN)/tlp-usblist
+endif
+
+	## pci
+ifndef TLP_NO_PCI
+	install -D -m 755 tlp-pcilist $(SBIN)/tlp-pcilist
 endif
 
 	## tpacpi
@@ -128,35 +139,3 @@ endif
 endif
 
 install: install-tlp install-rdw
-
-uninstall-tlp:
-	# Package tlp
-	rm -f $(SBIN)/tlp
-	rm -f $(BIN)/bluetooth
-	rm -f $(BIN)/wifi
-	rm -f $(BIN)/wwan
-	rm -f $(BIN)/run-on-ac
-	rm -f $(BIN)/run-on-bat
-	rm -f $(BIN)/tlp-stat
-	rm -f $(BIN)/tlp-usblist
-	rm -f $(TLIB)/tpacpi-bat
-	rm -f $(TLIB)/tlp-functions
-	rm -f $(TLIB)/tlp-rf-func
-	test ! -d $(TLIB) || rmdir $(TLIB)
-	rm -f $(ULIB)/tlp-usb-udev
-	rm -f $(ULIB)/rules.d/40-tlp.rules
-	rm -f $(DESTDIR)/etc/init.d/tlp
-	rm -f $(DESTDIR)/etc/network/if-up.d/tlp-ifup
-	rm -f $(PLIB)/power.d/zztlp
-	rm -f $(PLIB)/sleep.d/49wwan
-	rm -f $(PLIB)/sleep.d/49bay
-	rm -f $(DESTDIR)/etc/bash_completion.d/tlp
-
-uninstall-rdw:
-	# Package tlp-rdw
-	rm -f $(ULIB)/rules.d/40-tlp-rdw.rules
-	rm -f $(ULIB)/tlp-rdw-udev
-	rm -f $(NMDSP)/99tlp-rdw-nm
-	rm -f $(PLIB)/sleep.d/48tlp-rdw-lock
-
-uninstall: uninstall-tlp uninstall-rdw
