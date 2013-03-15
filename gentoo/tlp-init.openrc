@@ -18,7 +18,7 @@ depend() {
 	after modules
 
 	# sysfs is required (bat thresholds); dbus:upowerd; localmount:/usr
-   need sysfs dbus localmount
+   need sysfs dbus localmount acpid
 
    # run after xdm to avoid bluetooth/wwan/... race-condition with gdm
    after xdm
