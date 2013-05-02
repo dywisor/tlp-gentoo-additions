@@ -361,9 +361,8 @@ All options with a value can also be specified in --opt=<value> syntax.
 
 Valid configure targets are:
 * default, ubuntu -- do nothing
-* gentoo          -- relocate TLP's config file to /etc/conf.d and
-                     use an external tpacpi-bat script (/usr/sbin/tpacpi-bat)
-                     instead of the bundled one
+* gentoo          -- relocate TLP's config file to /etc/conf.d and use
+                     an external tpacpi-bat script instead of the bundled one
 * env             -- use variables (CONFFILE, TPACPIBAT) from the environment
                      and configure the source files accordingly
 "
@@ -491,7 +490,7 @@ __configure__() {
       gentoo)
          tlp_conffile  "/etc/conf.d/tlp"
          if ! kw='tpacpi-bundled' _in ${WITH}; then
-            tlp_tpacpibat "/usr/sbin/tpacpi-bat"
+            tlp_tpacpibat "tpacpi-bat"
          fi
       ;;
       env)
