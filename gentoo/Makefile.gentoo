@@ -8,7 +8,7 @@ BIN   = $(DESTDIR)/usr/bin
 PMETC = $(DESTDIR)/etc/pm/power.d
 TLIB  = $(DESTDIR)/usr/$(LIBDIR)/tlp-pm
 PLIB  = $(DESTDIR)/usr/$(LIBDIR)/pm-utils
-ULIB  = $(DESTDIR)/$(LIBDIR)/udev
+ULIB  = $(DESTDIR)/lib/udev
 NMDSP = $(DESTDIR)/etc/NetworkManager/dispatcher.d
 ACPI  = $(DESTDIR)/etc/acpi
 
