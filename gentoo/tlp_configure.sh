@@ -398,8 +398,7 @@ __configure__() {
 
       case "${1}" in
          --from-env)
-            shift
-            set -- '--target' 'env'
+            CONFIGURE_TARGET=env
          ;;
          --?*=*)
             # push back to %argv as '--opt' '<value>'
