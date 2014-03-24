@@ -1,5 +1,0 @@
-
-# ------------------------------------------------------------------------------
-# Set to 'n' to disable automated module loading.
-# Defaults to 'y'
-#TLP_LOAD_MODULES=y

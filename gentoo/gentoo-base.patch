@@ -1,0 +1,100 @@
+diff --git a/README b/README
+index 2e008a9..acca4a3 100644
+--- a/README
++++ b/README
+@@ -33,7 +33,7 @@ Additional functions:
+ - Battery charge thresholds - ThinkPads only
+ - Recalibrate battery - ThinkPads only
+ 
+-All TLP settings are stored in /etc/default/tlp. The default configuration
++All TLP settings are stored in /etc/conf.d/tlp. The default configuration
+ provides optimized power saving out of the box.
+ 
+ Read the the full documentation at:
+diff --git a/default b/default
+index 75e3088..3bd35a6 100644
+--- a/default
++++ b/default
+@@ -4,7 +4,7 @@
+ # Hint: some features are disabled by default, remove the leading # to enable them
+ 
+ # Set to 0 to disable/1 to enable TLP
+-TLP_ENABLE=1
++TLP_ENABLE=0
+ 
+ # Seconds laptop mode has to to wait after the disk goes idle before doing a sync.
+ # Non-zero value enables, zero disables laptop mode.
+@@ -219,3 +219,8 @@ RESTORE_DEVICE_STATE_ON_STARTUP=0
+ #DEVICES_TO_ENABLE_ON_UNDOCK="wifi"
+ #DEVICES_TO_DISABLE_ON_UNDOCK=""
+ 
++
++# ------------------------------------------------------------------------------
++# Set to 'n' to disable automated module loading.
++# Defaults to 'y'
++#TLP_LOAD_MODULES=y
+diff --git a/man/tlp-stat.8 b/man/tlp-stat.8
+index 7bb7a68..f3b7152 100644
+--- a/man/tlp-stat.8
++++ b/man/tlp-stat.8
+@@ -25,7 +25,7 @@ Show temperatures and fan speed only.
+ Show trace output from /var/log/debug.
+ 
+ .SH FILES
+-.I /etc/default/tlp
++.I /etc/conf.d/tlp
+ .RS
+ System configuration file containing all power management settings.
+ .SH SEE ALSO
+diff --git a/man/tlp.8 b/man/tlp.8
+index e403c04..3c73c44 100644
+--- a/man/tlp.8
++++ b/man/tlp.8
+@@ -51,7 +51,7 @@ Same as tlp-stat.
+ .B diskid
+ Show disk ids for configuration.
+ .SH FILES
+-.I /etc/default/tlp
++.I /etc/conf.d/tlp
+ .RS
+ System configuration file containing all power management settings.
+ .SH SEE ALSO
+diff --git a/tlp-functions b/tlp-functions
+index fa216cd..b59af6b 100755
+--- a/tlp-functions
++++ b/tlp-functions
+@@ -13,7 +13,7 @@
+ 
+ readonly TLPVER="0.5"
+ 
+-readonly CONFFILE=/etc/default/tlp
++readonly CONFFILE=/etc/conf.d/tlp
+ readonly RUNDIR=/var/run/tlp
+ 
+ readonly ETHTOOL=ethtool
+diff --git a/tlp-nop b/tlp-nop
+index 3d53220..13a6e50 100755
+--- a/tlp-nop
++++ b/tlp-nop
+@@ -2,7 +2,7 @@
+ # tlp - if tlp is enabled, override corresponding script
+ #       in /usr/lib*/pm-utils/power.d/
+ 
+-CONFFILE=/etc/default/tlp
++CONFFILE=/etc/conf.d/tlp
+ LIBDIRS='/usr/lib /usr/lib64'
+ 
+ for d in ${LIBDIRS}; do
+diff --git a/tlp-usb-udev b/tlp-usb-udev
+index ca04c82..6d50254 100755
+--- a/tlp-usb-udev
++++ b/tlp-usb-udev
+@@ -15,7 +15,7 @@ readonly USB_WWAN_VENDORS="0bdb 05c6 1199"
+ readonly RUNDIR=/var/run/tlp
+ readonly USB_DONE=usb_done
+ 
+-readonly CONFFILE=/etc/default/tlp
++readonly CONFFILE=/etc/conf.d/tlp
+ 
+ # --- Subroutines
+ wordinlist () { # test if word in list

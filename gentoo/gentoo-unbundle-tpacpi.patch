@@ -1,0 +1,13 @@
+diff --git a/tlp-functions b/tlp-functions
+index b59af6b..27ed51d 100755
+--- a/tlp-functions
++++ b/tlp-functions
+@@ -27,7 +27,7 @@ readonly LAPMODE=laptop_mode
+ readonly NMCLI=nmcli
+ readonly NMTOOL=nm-tool
+ 
+-readonly TPACPIBAT=$libdir/tpacpi-bat # libdir is initialized by main program
++readonly TPACPIBAT=/usr/bin/tpacpi-bat # gentoo-unbundle-tpacpi
+ 
+ readonly SMAPIDIR=/sys/devices/platform/smapi
+ readonly ACPIBATDIR=/sys/class/power_supply
