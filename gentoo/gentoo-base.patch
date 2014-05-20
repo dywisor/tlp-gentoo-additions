@@ -1,5 +1,19 @@
+From 8a16e1b9a029cb6595ace6da290a6c257e8d21b3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Erdmann?= <dywi@mailerd.de>
+Date: Tue, 20 May 2014 17:06:48 +0200
+Subject: [PATCH 2/3] gentoo-base
+
+---
+ README         | 2 +-
+ man/tlp-stat.8 | 2 +-
+ man/tlp.8      | 2 +-
+ tlp-functions  | 4 ++--
+ tlp-nop        | 2 +-
+ tlp-usb-udev   | 2 +-
+ 6 files changed, 7 insertions(+), 7 deletions(-)
+
 diff --git a/README b/README
-index 2e008a9..acca4a3 100644
+index 2e008a9..0245cee 100644
 --- a/README
 +++ b/README
 @@ -33,7 +33,7 @@ Additional functions:
@@ -7,34 +21,12 @@ index 2e008a9..acca4a3 100644
  - Recalibrate battery - ThinkPads only
  
 -All TLP settings are stored in /etc/default/tlp. The default configuration
-+All TLP settings are stored in /etc/conf.d/tlp. The default configuration
++All TLP settings are stored in /etc/tlp.conf. The default configuration
  provides optimized power saving out of the box.
  
  Read the the full documentation at:
-diff --git a/default b/default
-index 75e3088..3bd35a6 100644
---- a/default
-+++ b/default
-@@ -4,7 +4,7 @@
- # Hint: some features are disabled by default, remove the leading # to enable them
- 
- # Set to 0 to disable/1 to enable TLP
--TLP_ENABLE=1
-+TLP_ENABLE=0
- 
- # Seconds laptop mode has to to wait after the disk goes idle before doing a sync.
- # Non-zero value enables, zero disables laptop mode.
-@@ -219,3 +219,8 @@ RESTORE_DEVICE_STATE_ON_STARTUP=0
- #DEVICES_TO_ENABLE_ON_UNDOCK="wifi"
- #DEVICES_TO_DISABLE_ON_UNDOCK=""
- 
-+
-+# ------------------------------------------------------------------------------
-+# Set to 'n' to disable automated module loading.
-+# Defaults to 'y'
-+#TLP_LOAD_MODULES=y
 diff --git a/man/tlp-stat.8 b/man/tlp-stat.8
-index 7bb7a68..f3b7152 100644
+index 7bb7a68..1209ddd 100644
 --- a/man/tlp-stat.8
 +++ b/man/tlp-stat.8
 @@ -25,7 +25,7 @@ Show temperatures and fan speed only.
@@ -42,12 +34,12 @@ index 7bb7a68..f3b7152 100644
  
  .SH FILES
 -.I /etc/default/tlp
-+.I /etc/conf.d/tlp
++.I /etc/tlp.conf
  .RS
  System configuration file containing all power management settings.
  .SH SEE ALSO
 diff --git a/man/tlp.8 b/man/tlp.8
-index e403c04..3c73c44 100644
+index e403c04..2899aa7 100644
 --- a/man/tlp.8
 +++ b/man/tlp.8
 @@ -51,7 +51,7 @@ Same as tlp-stat.
@@ -55,25 +47,28 @@ index e403c04..3c73c44 100644
  Show disk ids for configuration.
  .SH FILES
 -.I /etc/default/tlp
-+.I /etc/conf.d/tlp
++.I /etc/tlp.conf
  .RS
  System configuration file containing all power management settings.
  .SH SEE ALSO
 diff --git a/tlp-functions b/tlp-functions
-index fa216cd..b59af6b 100755
+index fa216cd..a78cf4d 100755
 --- a/tlp-functions
 +++ b/tlp-functions
-@@ -13,7 +13,7 @@
+@@ -11,9 +11,9 @@
+ # ----------------------------------------------------------------------------
+ # Constants
  
- readonly TLPVER="0.5"
+-readonly TLPVER="0.5"
++readonly TLPVER="0.5-r1"
  
 -readonly CONFFILE=/etc/default/tlp
-+readonly CONFFILE=/etc/conf.d/tlp
++readonly CONFFILE=/etc/tlp.conf
  readonly RUNDIR=/var/run/tlp
  
  readonly ETHTOOL=ethtool
 diff --git a/tlp-nop b/tlp-nop
-index 3d53220..13a6e50 100755
+index 3d53220..242e09f 100755
 --- a/tlp-nop
 +++ b/tlp-nop
 @@ -2,7 +2,7 @@
@@ -81,12 +76,12 @@ index 3d53220..13a6e50 100755
  #       in /usr/lib*/pm-utils/power.d/
  
 -CONFFILE=/etc/default/tlp
-+CONFFILE=/etc/conf.d/tlp
++CONFFILE=/etc/tlp.conf
  LIBDIRS='/usr/lib /usr/lib64'
  
  for d in ${LIBDIRS}; do
 diff --git a/tlp-usb-udev b/tlp-usb-udev
-index ca04c82..6d50254 100755
+index ca04c82..63094df 100755
 --- a/tlp-usb-udev
 +++ b/tlp-usb-udev
 @@ -15,7 +15,7 @@ readonly USB_WWAN_VENDORS="0bdb 05c6 1199"
@@ -94,7 +89,10 @@ index ca04c82..6d50254 100755
  readonly USB_DONE=usb_done
  
 -readonly CONFFILE=/etc/default/tlp
-+readonly CONFFILE=/etc/conf.d/tlp
++readonly CONFFILE=/etc/tlp.conf
  
  # --- Subroutines
  wordinlist () { # test if word in list
+-- 
+1.9.3
+

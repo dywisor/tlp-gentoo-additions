@@ -1,5 +1,14 @@
+From 739cc6e7a5e361096c9c32bda4d746294f3e25cf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andr=C3=A9=20Erdmann?= <dywi@mailerd.de>
+Date: Mon, 24 Mar 2014 20:56:05 +0100
+Subject: [PATCH 3/3] gentoo-unbundle-tpacpi
+
+---
+ tlp-functions | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
 diff --git a/tlp-functions b/tlp-functions
-index b59af6b..27ed51d 100755
+index a78cf4d..1894160 100755
 --- a/tlp-functions
 +++ b/tlp-functions
 @@ -27,7 +27,7 @@ readonly LAPMODE=laptop_mode
@@ -11,3 +20,6 @@ index b59af6b..27ed51d 100755
  
  readonly SMAPIDIR=/sys/devices/platform/smapi
  readonly ACPIBATDIR=/sys/class/power_supply
+-- 
+1.9.3
+
