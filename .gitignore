@@ -1,2 +1,8 @@
+!.gitignore
+
+/build/
 /local/
 /dist
+/gentoo-patches/
+
+/bin/scp-upload
