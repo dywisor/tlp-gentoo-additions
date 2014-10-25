@@ -75,7 +75,7 @@ tlp_devlist_read_driver_link() {
 tlp_pcilist_process_dev() { # $1: dev, remainder ($2..): classdesc
     [ -n "${1-}" ] || return 1
 
-    local dev classdesc devp devc pmode class driver_link_target driver
+    local dev classdesc devp devc pmode class driver
 
     dev="${1}"; shift
     classdesc="${*:-<unknown>}"
