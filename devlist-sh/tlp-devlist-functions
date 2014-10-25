@@ -61,12 +61,21 @@ tlp_devlist_read_sysfs_attr() {
     return 1
 }
 
+tlp_devlist_read_driver_link() {
+    driver=
+    local link_target
+
+    link_target="$(readlink -- "${1}" 2>/dev/null)" || return 1
+    [ -n "${link_target}" ] || return 2
+    driver="${link_target##*/}"
+}
+
 
 # --- pcilist functions, tlp_pcilist*()
 tlp_pcilist_process_dev() { # $1: dev, remainder ($2..): classdesc
     [ -n "${1-}" ] || return 1
 
-    local dev classdesc devp devc pmode class
+    local dev classdesc devp devc pmode class driver_link_target driver
 
     dev="${1}"; shift
     classdesc="${*:-<unknown>}"
@@ -78,8 +87,10 @@ tlp_pcilist_process_dev() { # $1: dev, remainder ($2..): classdesc
         # $devp not valid if no class attribute present
         tlp_devlist_read_sysfs_file pmode "${devc}"
 
-        printf "%s = %-4s (%s %s)\n" \
-            "${devc}" "${pmode:-???}" "${class}" "${classdesc}"
+        tlp_devlist_read_driver_link "${devp}/driver" || driver="no driver"
+
+        printf "%s = %-4s (%s, %s, %s)\n" \
+            "${devc}" "${pmode:-???}" "${class}" "${classdesc}" "${driver}"
     else
         return 2
     fi
@@ -115,10 +126,8 @@ tlp_usblist_get_driverlist() { # $1: usbdev sysfs path
 
     set --
     for subdev in "${usbdev}/"*":"*; do
-        driver="$(readlink -- "${subdev}/driver" 2>/dev/null)"
-
-        if [ $? -eq 0 ] && [ -n "${driver}" ]; then
-            driver="${driver##*/},"
+        if tlp_devlist_read_driver_link "${subdev}/driver"; then
+            driver="${driver},"
             driver_in_list=false
 
             for iter; do
