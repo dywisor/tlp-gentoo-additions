@@ -4,10 +4,15 @@ S := $(CURDIR)
 O := $(S)
 
 # Evaluate parameters
+ifeq ($(STANDALONE),y)
+TLP_LIBDIR ?= $(CURDIR)
+TLP_BIN    ?= $(CURDIR)
+TLP_TLIB    = $(CURDIR)
+else
 TLP_LIBDIR ?= /usr/lib
 TLP_BIN    ?= /usr/bin
 TLP_TLIB    = $(TLP_LIBDIR)/tlp-pm
-
+endif
 
 # Catenate DESTDIR to paths
 _BIN   = $(DESTDIR)$(TLP_BIN)
