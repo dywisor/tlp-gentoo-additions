@@ -167,8 +167,6 @@ tlp_usblist_process_dev() { # $1: bus, $2: dev, $3: usbid, remainder: desc
     local asv_fmt_len
     local attr_name attr_val
 
-    local outformat #REMOVING
-
     [ -n "${1-}" ] && [ -n "${2-}" ] && [ -n "${3-}" ] || return 1
 
     busnum="${1}"
