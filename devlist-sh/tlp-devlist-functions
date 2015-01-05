@@ -62,26 +62,29 @@ tlp_devlist_read_sysfs_attr() {
 }
 
 tlp_devlist_read_uevent_key() {
-   v0=
+   val=
    local line
+
    while read -r line; do
       case "${line}" in
          "${2}="*)
-            v0="${line#*=}"
+            val="${line#*=}"
             return 0
          ;;
       esac
    done < "${1}"
+
    return 1
 }
 
 tlp_devlist_get_driver() {
    driver=
+   local val
    [ -r "${1}/uevent" ] || return 2
 
    tlp_devlist_read_uevent_key "${1}/uevent" "DRIVER" || return 1
 
-   [ -n "${v0}" ] && driver="${v0}"
+   [ -n "${val}" ] && driver="${val}"
 }
 
 
