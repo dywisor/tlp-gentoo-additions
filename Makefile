@@ -15,6 +15,8 @@ TLP_GIT_BRANCH   = master
 endif
 TLP_GIT_CHECKOUT = origin/$(TLP_GIT_BRANCH)
 
+TLP_GIT_CPICK    =
+
 TLP_CONF         = /etc/tlp.conf
 
 
@@ -53,6 +55,11 @@ endef
 # * base patches
 define _BASEPATCH
 	test -n "$(1)"
+	{ set -e; \
+		$(foreach p,$(TLP_GIT_CPICK),\
+			$(X_GIT) -C "$(1)" cherry-pick -x $(p) || exit;) \
+	} </dev/null
+
 	{ $(foreach p,$(BASE_PATCHES),\
 		 patch -N -d "$(1)" -up 1 -i "$(S)/files/patches/$(p)" &&\
 	) true; } </dev/null;
