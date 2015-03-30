@@ -189,7 +189,7 @@ $(_GENPATCHES_WORKDIR)/patches.tar.xz: $(_GENPATCHES_WORKDIR)/tlp.git
 		-o "$</patches" $(GIT_FMT_PATCH_OPTS) "$(TLP_GIT_CHECKOUT).."
 
 	# tar it
-	tar cJ --owner=root --group=root -C "$<" ./patches/ -f "$(<)/$(@F)"
+	tar cJ --owner=root --group=root --numeric-owner -C "$<" ./patches/ -f "$(<)/$(@F)"
 	mv -- "$(<)/$(@F)" "$@"
 
 
