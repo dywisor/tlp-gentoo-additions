@@ -34,6 +34,8 @@ GIT_FMT_PATCH_OPTS =
 
 BASE_PATCHES =
 BASE_PATCHES += systemd-compat-no-nm-workaround.patch
+EXTRA_GIT_PATCHES ?=
+
 
 _GENPATCHES_WORKDIR = $(O)/work/gentoo
 
@@ -58,6 +60,20 @@ define _BASEPATCH
 	{ set -e; \
 		$(foreach p,$(TLP_GIT_CPICK),\
 			$(X_GIT) -C "$(1)" cherry-pick -x $(p) || exit;) \
+	} </dev/null
+
+	{ set -e; \
+		$(foreach p,$(EXTRA_GIT_PATCHES),\
+			if [ -d "$(p)" ]; then \
+				for pf in $$(\
+					find "$(p)" -type f -name "*.patch" | LC_ALL=C LANG=C sort \
+				); do \
+					$(X_GIT) -C "$(1)" am < "$${pf}" || exit; \
+				done; \
+			else \
+				$(X_GIT) -C "$(1)" am < "$(p)" || exit; \
+			fi;\
+		) \
 	} </dev/null
 
 	{ $(foreach p,$(BASE_PATCHES),\
