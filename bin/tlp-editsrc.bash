@@ -42,6 +42,8 @@ set -u
 SRCFIND_RE_EXCLUDE=
 SRCFIND_RE_EXCLUDE+="COPYING|LICENSE|changelog|Makefile|default|tpacpi-bat"
 SRCFIND_RE_EXCLUDE+="|.*[.](rules|service|upstart|init|bash_comp.*)"
+
+SRCFIND_RE_EXCLUDE="((${SRCFIND_RE_EXCLUDE})([.]in)?)"
 readonly SRCFIND_RE_EXCLUDE
 
 
@@ -70,7 +72,7 @@ print_debug() {
 # @stdout tlp_srcfind ( *dirs, **SRCFIND_RE_EXCLUDE )
 tlp_srcfind() {
    find "$@" -maxdepth 1 -type f -print | \
-      grep -vxE -- "([.]/)?(${SRCFIND_RE_EXCLUDE})"
+      grep -vxE -- "([.]/)?${SRCFIND_RE_EXCLUDE}"
    return ${PIPESTATUS[0]}
 }
 
@@ -224,12 +226,6 @@ while [[ $# -gt 0 ]]; do
 
          case "${buf}" in
 
-            "conffile"|"CONFFILE")
-               # ++ pass TLP_CONF to make
-               #doshift=0
-               [[ -n "${1-}" ]] || die "${arg}, ${buf}: arg expected."
-               set -- str_replace /etc/default/tlp "$@"
-            ;;
             "pcilist-sbin")
                editmak_expressions+=(
                   's@(install.*tlp-pcilist\s+)\$\(_BIN\)/@\1$(_SBIN)/@'
@@ -240,9 +236,6 @@ while [[ $# -gt 0 ]]; do
                doshift=1
                [[ -n "${1-}" ]] || die "${arg}, ${buf}: arg expected."
                editmak_expressions+=( "/(install|ln)(\s.*)?\s+${1}/d" )
-            ;;
-            "no-radiosw")
-               editmak_expressions+=( '/thinkpad-radiosw/d' )
             ;;
 
             # extra config options
@@ -261,7 +254,7 @@ while [[ $# -gt 0 ]]; do
                doshift=1
                [[ -n "${1+SET}" ]] || die "${arg}, ${buf}: arg expected."
 
-               __tlp_debug_all="bat disk lock nm path pm rf run udev usb"
+               __tlp_debug_all="bat disk lock nm path pm rf run sysfs udev usb"
 
                cfgfile_append+=(
                   ""
@@ -314,39 +307,6 @@ while [[ $# -gt 0 ]]; do
                # ! does not imply "no-radiosw"
                editmak_expressions+=( '/\(_BIN\)\/(bluetooth|wifi|wwan)/d' )
             ;;
-            "libdir")
-               # = relocate libdir files
-               # * changes libdir ($LIBDIRS) from /usr/lib*/tlp-pm to $1
-               # ! $1 should point to a TLP-specific dir
-               #   (/usr/share/tlp-pm, but not /usr/share)
-               # * changes TLP_TLIB in the Makefile
-               # * tlp-functions already sets TPACPIBAT=$libdir/tpacpi-bat,
-               #   nothing to do here
-               # * special arg: share/sharedir: relocate to /usr/share/tlp-pm
-               k=
-               case "${1-}" in
-                  '')
-                     die "${arg}, ${buf}: arg expected."
-                  ;;
-                  /?*)
-                     k="${1%/}"
-                  ;;
-                  share|sharedir)
-                     k="/usr/share/tlp-pm"
-                  ;;
-                  *)
-                     die "${arg}, ${buf}: relpath not allowed: ${1}"
-                  ;;
-               esac
-               : ${k:?}
-               shift || die
-
-               tlp_src_get_editvar_expr LIBDIRS "${k}"
-               editvar_expressions+=( "${editvar_expr}" )
-               editmak_expressions+=(
-                  "s@^(TLP_TLIB\s.*?=\s*).*/tlp-pm\s*\$@\1${k}@"
-               )
-            ;;
 
             *)
                die "${arg}: '${buf}' unknown" 64
@@ -392,6 +352,7 @@ autodie tlp_src_apply_edit_expressions_to ./Makefile
 if [[ ${#cfgfile_append[*]} -gt 0 ]]; then
    {
       for line in \
+         "" \
          "# ------------------------------------------------------------------------------" \
          "# additional config options" \
          "" \

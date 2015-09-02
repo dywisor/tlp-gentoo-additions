@@ -17,8 +17,6 @@ TLP_GIT_CHECKOUT = origin/$(TLP_GIT_BRANCH)
 
 TLP_GIT_CPICK    =
 
-TLP_CONF         = /etc/tlp.conf
-
 
 TLP_FAKEVER   =
 TLP_APPENDVER =
@@ -87,17 +85,10 @@ define _GENPATCH_BASE
 	$(X_EDITSRC) -d "$(1)" \
 		$(if    $(TLP_FAKEVER),MACRO setver $(TLP_FAKEVER)) \
 		$(if    $(TLP_APPENDVER),MACRO appendver $(TLP_APPENDVER)) \
-		MACRO   conffile $(TLP_CONF) \
 		CFGVAR  TLP_ENABLE 0 \
 		MACRO   TLP_LOAD_MODULES \
 		MACRO   TLP_DEBUG _ \
 		MACRO   pcilist-sbin
-endef
-
-# * no-radiosw (controlled by the "deprecated" USE flag)
-define _GENPATCH_NO_RADIOSW
-	test -n "$(1)"
-	$(X_EDITSRC) -d "$(1)" MACRO no-radiosw
 endef
 
 # * unbundle-tpacpi-bat  (controlled by the "tpacpi-bundled" USE flag)
@@ -112,13 +103,12 @@ PHONY =
 PHONY += default
 default:
 	@echo "Usage: make [DEVEL=1] [UPLOAD=1] [TLP_FAKEVER=] genpatches" >&2
-	@echo "Usage: make [TLP_APPENDVER=] [TLP_SRC=] [TLP_CONF=] livepatch-base" >&2
-	@echo "Usage: make [TLP_SRC=] livepatch-no-deprecated" >&2
+	@echo "Usage: make [TLP_APPENDVER=] [TLP_SRC=] livepatch-base" >&2
 	@echo "Usage: make [TLP_SRC=] livepatch-unbundle-tpacpi-bat" >&2
 	@false
 
 _LIVEPATCH_TARGETS = \
-	$(addprefix livepatch-,basepatch base no-deprecated unbundle-tpacpi-bat)
+	$(addprefix livepatch-,basepatch base unbundle-tpacpi-bat)
 
 PHONY += $(_LIVEPATCH_TARGETS) basepatch
 ifeq ($(TLP_SRC),)
@@ -136,9 +126,6 @@ $(TLP_SRC)/.lp_base.stamp: $(TLP_SRC)/.lp_basepatch.stamp
 	$(call _GENPATCH_BASE,$(@D))
 	touch $@
 
-$(TLP_SRC)/.lp_no-deprecated.stamp: $(TLP_SRC)/.lp_base.stamp
-	$(call _GENPATCH_NO_RADIOSW,$(@D))
-	touch $@
 
 $(TLP_SRC)/.lp_unbundle-tpacpi-bat.stamp: $(TLP_SRC)/.lp_base.stamp
 	$(call _GENPATCH_UNBUNDLE_TPACPIBAT,$(@D))
@@ -148,7 +135,7 @@ endif
 PHONY += genpatches
 genpatches: $(_GENPATCHES_WORKDIR)/patches.tar.xz | $(_GENPATCHES_WORKDIR)/tlp.git
 	$(eval MY_GENPATCHES_TLPVER = \
-		$(shell $(X_READVER) "$(_GENPATCHES_WORKDIR)/tlp.git/tlp-functions"))
+		$(shell $(X_READVER) "$(_GENPATCHES_WORKDIR)/tlp.git/tlp-functions.in"))
 	test -n '$(MY_GENPATCHES_TLPVER)'
 
 	$(eval MY_GENPATCHES_DISTFILE = \
@@ -197,10 +184,6 @@ $(_GENPATCHES_WORKDIR)/patches.tar.xz: $(_GENPATCHES_WORKDIR)/tlp.git
 	$(call _GENPATCH_BASE,$<)
 
 	$(X_GIT) -C "$<" commit -a -m "gentoo-base" $(GIT_COMMIT_OPTS)
-
-	# USE: deprecated
-	$(call _GENPATCH_NO_RADIOSW,$<)
-	$(X_GIT) -C "$<" commit -a -m "no-radiosw" $(GIT_COMMIT_OPTS)
 
 	# USE: tpacpi-bundled
 	$(call _GENPATCH_UNBUNDLE_TPACPIBAT,$<)
