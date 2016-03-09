@@ -31,7 +31,6 @@ GIT_COMMIT_OPTS    =
 GIT_FMT_PATCH_OPTS =
 
 BASE_PATCHES =
-BASE_PATCHES += systemd-compat-no-nm-workaround.patch
 EXTRA_GIT_PATCHES ?=
 
 
