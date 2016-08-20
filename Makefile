@@ -93,7 +93,7 @@ endef
 # * unbundle-tpacpi-bat  (controlled by the "tpacpi-bundled" USE flag)
 define _GENPATCH_UNBUNDLE_TPACPIBAT
 	test -n "$(1)"
-	$(X_EDITSRC) -d "$(1)" EDITVAR TPACPIBAT /usr/bin/tpacpi-bat
+	$(X_EDITSRC) -d "$(1)" EDITVAR TPACPIBAT tpacpi-bat
 endef
 
 
