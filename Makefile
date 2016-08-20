@@ -8,11 +8,7 @@ X_READVER = awk -f $(S)/bin/readver
 X_UPLOAD      = $(S)/bin/scp-upload
 
 TLP_GIT_URI      = https://github.com/linrunner/TLP.git
-ifeq ($(DEVEL),1)
-TLP_GIT_BRANCH   = devel
-else
 TLP_GIT_BRANCH   = master
-endif
 TLP_GIT_CHECKOUT = origin/$(TLP_GIT_BRANCH)
 
 TLP_GIT_CPICK    =
@@ -101,7 +97,7 @@ PHONY =
 
 PHONY += default
 default:
-	@echo "Usage: make [DEVEL=1] [UPLOAD=1] [TLP_FAKEVER=] genpatches" >&2
+	@echo "Usage: make [UPLOAD=1] [TLP_FAKEVER=] genpatches" >&2
 	@echo "Usage: make [TLP_APPENDVER=] [TLP_SRC=] livepatch-base" >&2
 	@echo "Usage: make [TLP_SRC=] livepatch-unbundle-tpacpi-bat" >&2
 	@false
