@@ -130,7 +130,7 @@ endif
 PHONY += genpatches
 genpatches: $(_GENPATCHES_WORKDIR)/patches.tar.xz | $(_GENPATCHES_WORKDIR)/tlp.git
 	$(eval MY_GENPATCHES_TLPVER = \
-		$(shell $(X_READVER) "$(_GENPATCHES_WORKDIR)/tlp.git/tlp-functions.in"))
+		$(shell $(X_READVER) "$(_GENPATCHES_WORKDIR)/tlp.git/tlp-func-base.in"))
 	test -n '$(MY_GENPATCHES_TLPVER)'
 
 	$(eval MY_GENPATCHES_DISTFILE = \
