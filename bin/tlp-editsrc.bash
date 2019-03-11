@@ -254,7 +254,7 @@ while [[ $# -gt 0 ]]; do
                doshift=1
                [[ -n "${1+SET}" ]] || die "${arg}, ${buf}: arg expected."
 
-               __tlp_debug_all="bat disk lock nm path pm rf run sysfs udev usb"
+               __tlp_debug_all="bat disk lock nm path pm ps rf run sysfs udev usb"
 
                cfgfile_append+=(
                   ""
